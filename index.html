@@ -1,221 +1,186 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>AI POS Dashboard</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset="UTF-8">
+<title>Dashboard Penjualan Lengkap</title>
 
-  <style>
-    body { font-family: Arial; margin: 0; background: #f4f6f9; }
-    header { background: #1e293b; color: white; padding: 15px; text-align: center; }
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf"></script>
 
-    .container { padding: 20px; }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-    }
-
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-
-    input, button {
-      padding: 10px;
-      width: 100%;
-      margin-top: 10px;
-    }
-
-    button {
-      background: #2563eb;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-
-    table {
-      width: 100%;
-      margin-top: 20px;
-      border-collapse: collapse;
-    }
-
-    th, td {
-      padding: 10px;
-      border-bottom: 1px solid #ddd;
-      text-align: center;
-    }
-
-    .delete {
-      background: red;
-      color: white;
-      border: none;
-      padding: 5px;
-      cursor: pointer;
-    }
-
-    .ai-box {
-      background: #eef2ff;
-      padding: 15px;
-      border-radius: 10px;
-      margin-top: 20px;
-    }
-  </style>
+<style>
+body { font-family: Arial; margin:0; background:#f4f6f9;}
+header { background:#1e293b; color:white; padding:15px; text-align:center;}
+.container { padding:20px;}
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px;}
+.card { background:white; padding:20px; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.1);}
+input,select,button { padding:10px; width:100%; margin-top:10px;}
+button { background:#2563eb; color:white; border:none; cursor:pointer;}
+</style>
 </head>
 
 <body>
 
-<header>🛒 AI POS Dashboard</header>
+<header>📊 Dashboard Penjualan Lengkap</header>
 
 <div class="container">
 
-  <!-- INPUT PRODUK -->
-  <div class="card">
-    <h3>Tambah Produk</h3>
-    <input type="text" id="nama" placeholder="Nama produk">
-    <input type="number" id="harga" placeholder="Harga">
-    <button onclick="tambah()">Tambah</button>
-  </div>
+<!-- INPUT -->
+<div class="card">
+<h3>Input Data</h3>
+<input id="produk" placeholder="Produk">
+<input id="amount" type="number" placeholder="Pendapatan">
+<input id="discount" type="number" placeholder="Diskon">
+<input id="fee" type="number" placeholder="Biaya">
+<input id="province" placeholder="Provinsi">
+<input id="city" placeholder="Kota">
+<select id="payment">
+<option>Cash</option>
+<option>GoPay</option>
+<option>Transfer</option>
+</select>
+<button onclick="tambah()">Tambah</button>
+</div>
 
-  <!-- KPI -->
-  <div class="grid">
-    <div class="card">
-      <h3>Total Penjualan</h3>
-      <p id="total">0</p>
-    </div>
+<!-- KPI -->
+<div class="grid">
+<div class="card"><h3>Total Revenue</h3><p id="revenue">0</p></div>
+<div class="card"><h3>Total Order</h3><p id="order">0</p></div>
+<div class="card"><h3>AOV</h3><p id="aov">0</p></div>
+</div>
 
-    <div class="card">
-      <h3>Jumlah Produk</h3>
-      <p id="jumlah">0</p>
-    </div>
+<!-- REGIONAL -->
+<div class="card">
+<h3>Regional Analysis</h3>
+<ul id="region"></ul>
+</div>
 
-    <div class="card">
-      <h3>Rata-rata Harga</h3>
-      <p id="rata">0</p>
-    </div>
-  </div>
+<!-- PAYMENT -->
+<div class="card">
+<h3>Payment Method</h3>
+<canvas id="paymentChart"></canvas>
+</div>
 
-  <!-- CHART -->
-  <div class="card">
-    <h3>Grafik Penjualan</h3>
-    <canvas id="chart"></canvas>
-  </div>
+<!-- FINANCIAL -->
+<div class="grid">
+<div class="card"><h3>Pendapatan Kotor</h3><p id="kotor">0</p></div>
+<div class="card"><h3>Diskon</h3><p id="diskon">0</p></div>
+<div class="card"><h3>Biaya</h3><p id="biaya">0</p></div>
+<div class="card"><h3>Laba Bersih</h3><p id="laba">0</p></div>
+</div>
 
-  <!-- TABEL -->
-  <div class="card">
-    <h3>Daftar Produk</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>No</th>
-          <th>Nama</th>
-          <th>Harga</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
-  </div>
+<!-- ZAKAT -->
+<div class="card">
+<h3>Zakat (2.5%)</h3>
+<p id="zakat">0</p>
+</div>
 
-  <!-- AI ANALISIS -->
-  <div class="ai-box">
-    <h3>🤖 AI Analisis</h3>
-    <p id="aiText">Klik tombol untuk analisis...</p>
-    <button onclick="analisisAI()">Analisis Sekarang</button>
-  </div>
+<!-- AI -->
+<div class="card">
+<h3>🤖 AI Insight</h3>
+<p id="ai">Klik untuk analisis</p>
+<button onclick="aiInsight()">Analisis AI</button>
+</div>
+
+<!-- PDF -->
+<div class="card">
+<h3>Export Laporan</h3>
+<button onclick="downloadPDF()">Download PDF</button>
+</div>
 
 </div>
 
 <script>
-let data = JSON.parse(localStorage.getItem("produk")) || [];
+let data = JSON.parse(localStorage.getItem("data")) || [];
 
-const ctx = document.getElementById("chart").getContext("2d");
-
-const chart = new Chart(ctx, {
-  type: "bar",
-  data: {
-    labels: [],
-    datasets: [{
-      label: "Harga Produk",
-      data: []
-    }]
-  }
+const chart = new Chart(document.getElementById("paymentChart"), {
+type:"pie",
+data:{labels:["Cash","GoPay","Transfer"],datasets:[{data:[0,0,0]}]}
 });
 
-function render() {
-  let total = data.reduce((a,b)=>a+b.harga,0);
-  let jumlah = data.length;
-  let rata = jumlah ? (total/jumlah).toFixed(2) : 0;
-
-  document.getElementById("total").innerText = total;
-  document.getElementById("jumlah").innerText = jumlah;
-  document.getElementById("rata").innerText = rata;
-
-  chart.data.labels = data.map(d=>d.nama);
-  chart.data.datasets[0].data = data.map(d=>d.harga);
-  chart.update();
-
-  let tbody = document.getElementById("tbody");
-  tbody.innerHTML = "";
-
-  data.forEach((d,i)=>{
-    tbody.innerHTML += `
-      <tr>
-        <td>${i+1}</td>
-        <td>${d.nama}</td>
-        <td>${d.harga}</td>
-        <td><button class="delete" onclick="hapus(${i})">X</button></td>
-      </tr>
-    `;
-  });
-
-  localStorage.setItem("produk", JSON.stringify(data));
-}
-
 function tambah(){
-  let nama = document.getElementById("nama").value;
-  let harga = parseInt(document.getElementById("harga").value);
-
-  if(!nama || !harga) return alert("Isi semua data!");
-
-  data.push({nama, harga});
-  document.getElementById("nama").value="";
-  document.getElementById("harga").value="";
-  render();
+let d={
+produk:produk.value,
+amount:+amount.value,
+discount:+discount.value||0,
+fee:+fee.value||0,
+province:province.value,
+city:city.value,
+payment:payment.value
+};
+if(!d.produk||!d.amount) return alert("Isi data!");
+data.push(d);
+render();
 }
 
-function hapus(i){
-  data.splice(i,1);
-  render();
+function render(){
+
+let revenue=data.reduce((a,b)=>a+b.amount,0);
+let order=data.length;
+let aov=order?(revenue/order).toFixed(2):0;
+
+revenueEl.innerText=revenue;
+orderEl.innerText=order;
+aovEl.innerText=aov;
+
+let regionCount={};
+data.forEach(d=>{
+let key=d.province+" - "+d.city;
+regionCount[key]=(regionCount[key]||0)+1;
+});
+
+region.innerHTML="";
+Object.entries(regionCount).forEach(r=>{
+region.innerHTML+=`<li>${r[0]} : ${r[1]}</li>`;
+});
+
+let cash=0,gopay=0,transfer=0;
+data.forEach(d=>{
+if(d.payment=="Cash") cash++;
+if(d.payment=="GoPay") gopay++;
+if(d.payment=="Transfer") transfer++;
+});
+
+chart.data.datasets[0].data=[cash,gopay,transfer];
+chart.update();
+
+let kotor=revenue;
+let diskon=data.reduce((a,b)=>a+b.discount,0);
+let biaya=data.reduce((a,b)=>a+b.fee,0);
+let laba=kotor-diskon-biaya;
+
+kotorEl.innerText=kotor;
+diskonEl.innerText=diskon;
+biayaEl.innerText=biaya;
+labaEl.innerText=laba;
+
+zakatEl.innerText=(laba*0.025).toFixed(2);
+
+localStorage.setItem("data",JSON.stringify(data));
 }
 
-// 🤖 AI ANALISIS (SIMULASI CERDAS)
-function analisisAI(){
-  if(data.length === 0){
-    document.getElementById("aiText").innerText = "Belum ada data.";
-    return;
-  }
+function aiInsight(){
+if(data.length==0) return ai.innerText="Belum ada data";
 
-  let total = data.reduce((a,b)=>a+b.harga,0);
-  let rata = total / data.length;
+let revenue=data.reduce((a,b)=>a+b.amount,0);
+let avg=revenue/data.length;
 
-  let insight = "";
+let insight= avg>50000
+? "Penjualan tinggi, fokus premium"
+: "Penjualan rendah, perlu promosi";
 
-  if(rata > 50000){
-    insight = "Produk cenderung mahal. Fokus ke premium market.";
-  } else {
-    insight = "Produk relatif terjangkau. Cocok untuk pasar massal.";
-  }
+ai.innerText=`Revenue ${revenue}, Avg ${avg}. ${insight}`;
+}
 
-  let max = data.reduce((a,b)=> a.harga>b.harga ? a : b);
+function downloadPDF(){
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF();
 
-  document.getElementById("aiText").innerText =
-    `Total penjualan: ${total}. 
-Produk termahal: ${max.nama}.
-Insight: ${insight}`;
+doc.text("Laporan Keuangan",10,10);
+doc.text("Total Revenue: "+revenueEl.innerText,10,20);
+doc.text("Laba Bersih: "+labaEl.innerText,10,30);
+doc.text("Zakat: "+zakatEl.innerText,10,40);
+
+doc.save("laporan.pdf");
 }
 
 render();

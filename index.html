@@ -2,84 +2,59 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard Penjualan</title>
+  <title>Dashboard AI POS</title>
 
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: Arial;
       background: #f4f6f9;
-      margin: 0;
       padding: 20px;
-    }
-
-    h1 {
       text-align: center;
-    }
-
-    .container {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      flex-wrap: wrap;
     }
 
     .card {
       background: white;
       padding: 20px;
+      margin: 20px auto;
+      width: 300px;
       border-radius: 10px;
-      width: 250px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      text-align: center;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
 
     input, button {
       padding: 10px;
+      width: 80%;
       margin-top: 10px;
-      width: 100%;
     }
 
     button {
-      background: #007bff;
+      background: blue;
       color: white;
       border: none;
       cursor: pointer;
-    }
-
-    button:hover {
-      background: #0056b3;
     }
   </style>
 </head>
 
 <body>
 
-  <h1>📊 Dashboard Penjualan</h1>
+  <h1>📊 Dashboard AI POS</h1>
 
-  <div class="container">
-    <div class="card">
-      <h3>Input Penjualan</h3>
-      <input type="number" id="penjualan" placeholder="Masukkan jumlah">
-      <button onclick="hitung()">Hitung</button>
-    </div>
+  <div class="card">
+    <input type="number" id="input" placeholder="Masukkan penjualan">
+    <button onclick="proses()">Proses</button>
+  </div>
 
-    <div class="card">
-      <h3>Hasil</h3>
-      <p id="hasil">-</p>
-    </div>
+  <div class="card">
+    <h3>Hasil</h3>
+    <p id="output">-</p>
   </div>
 
   <script>
-    function hitung() {
-      const nilai = document.getElementById("penjualan").value;
-
-      if (!nilai) {
-        alert("Isi dulu datanya!");
-        return;
-      }
-
-      const hasil = nilai * 1.1; // contoh +10%
-      document.getElementById("hasil").innerText =
-        "Total: " + hasil;
+    function proses() {
+      const val = document.getElementById("input").value;
+      document.getElementById("output").innerText =
+        "Total: " + (val * 1.1);
     }
   </script>
 
